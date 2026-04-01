@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arthur Gaspar / Portfolio</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👻</text></svg>">
+<link rel="dns-prefetch" href="https://res.cloudinary.com">
+<link rel="dns-prefetch" href="https://i.giphy.com">
+<link rel="dns-prefetch" href="https://i.ytimg.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com">
+<link rel="preconnect" href="https://i.giphy.com">
+<link rel="preconnect" href="https://i.ytimg.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Roboto:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Roboto:wght@400;700&display=swap" rel="stylesheet"></noscript>
+<style>
+  :root {
+    --bg:      #000000;
+    --fg:      #ffffff;
+    --muted:   #666666;
+    --border:  #ffffff;
+    --surface: #111111;
+    --nav-height: 48px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-name {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--fg);
+    flex-shrink: 0;
+  }
+  .nav-center {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; text-align: center;
+    color: var(--muted);
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  .nav-right {
+    display: flex; justify-content: flex-end; gap: 20px;
+    flex-shrink: 0;
+  }
+  .nav-link {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; transition: color 0.15s; padding: 0;
+  }
+  .nav-link:hover { color: var(--fg); }
+
+  
+  main {
+    padding-top: var(--nav-height);
+    max-width: 100%;
+    margin: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  
+  .table-header {
+    display: grid;
+    grid-template-columns: 48px 1fr 140px auto;
+    gap: 0 16px;
+    padding: 8px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .col-label {
+    font-size: 9px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .col-label.right { text-align: right; }
+
+  
+  .project-wrap {
+    opacity: 0; transform: translateY(8px);
+    /* will-change applied via JS only during animation, removed after */
+    transition: opacity 0.4s cubic-bezier(0.22,1,0.36,1),
+                transform 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  .project-wrap.visible { opacity: 1; transform: translateY(0); }
+
+  
+  .project-item {
+    display: grid;
+    grid-template-columns: 48px 1fr 140px auto;
+    gap: 0 16px;
+    padding: 40px 24px;
+    align-items: center;
+    border-bottom: 0.5px solid rgba(255,255,255,0.2);
+    cursor: pointer; user-select: none;
+    /* Only animate opacity-based pseudo overlay, not layout properties */
+    position: relative;
+  }
+  /* Hover fill via pseudo-element — GPU only, no layout thrash */
+  .project-item::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--fg);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+  }
+  @media (hover: hover) {
+    .project-item:hover::before { opacity: 1; }
+  }
+  .project-item.active::before { opacity: 1; }
+
+  /* Text color swap via mix-blend-mode — no color transition on 4 selectors */
+  .project-item .project-number,
+  .project-item .project-title,
+  .project-item .project-sub,
+  .project-item .col-info,
+  .project-item .plus-info {
+    position: relative; /* sit above pseudo */
+    transition: color 0.15s ease;
+  }
+  @media (hover: hover) {
+    .project-item:hover .project-number,
+    .project-item:hover .project-sub,
+    .project-item:hover .col-info { color: #777; }
+    .project-item:hover .project-title { color: var(--bg); }
+    .project-item:hover .plus-info { color: var(--bg); }
+  }
+  .project-item.active .project-number,
+  .project-item.active .project-sub,
+  .project-item.active .col-info { color: #777; }
+  .project-item.active .project-title,
+  .project-item.active .plus-info { color: var(--bg); }
+  .project-item.active { border-bottom-color: transparent; }
+  @media (hover: hover) {
+    .project-item:hover .img-placeholder { background: #ccc; }
+    .project-item:hover .project-images div { background: #ccc; }
+  }
+  .project-item.active .img-placeholder { background: #ccc; }
+  .project-item.active .project-images div { background: #ccc; }
+
+  .project-number {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.05em; color: var(--muted);
+  }
+  .project-title {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    display: block; line-height: 1.3;
+  }
+  .project-sub {
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.03em; display: block;
+    margin-top: 1px;
+  }
+  .col-info {
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.03em; line-height: 1.6;
+  }
+  .col-action {
+    display: flex; align-items: center;
+    gap: 12px; justify-content: flex-end;
+  }
+  .project-images { display: flex; gap: 4px; align-items: center; position: relative; }
+  .project-images div {
+    width: 64px; height: 48px;
+    overflow: hidden; background: #222; flex-shrink: 0;
+  }
+  .project-images img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  @media (hover: hover) {
+    .project-item:hover .project-images img { transform: scale(1.05); }
+  }
+  .img-placeholder {
+    width: 100%; height: 100%; background: #222;
+  }
+  .plus-info {
+    font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; white-space: nowrap; font-weight: 700;
+  }
+
+  
+  /* Panel expand: grid-rows trick avoids the max-height hack
+     — no layout cost, works with content of any height */
+  .case-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s cubic-bezier(0.22,1,0.36,1);
+    border-bottom: 1px solid transparent;
+    transition: grid-template-rows 0.5s cubic-bezier(0.22,1,0.36,1),
+                border-color 0.2s;
+  }
+  .case-panel > * { overflow: hidden; }
+  .case-panel.open {
+    grid-template-rows: 1fr;
+    border-bottom-color: var(--border);
+  }
+
+  .case-inner {
+    background: var(--surface);
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 0.3s ease 0.15s, transform 0.3s cubic-bezier(0.22,1,0.36,1) 0.15s;
+  }
+  .case-panel.open .case-inner { opacity: 1; transform: translateY(0); }
+
+  /* Top info row: left credits + right description */
+  .case-top {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.2);
+  }
+
+  /* Left: credits */
+  .case-credits {
+    padding: 24px;
+    border-right: 0.5px solid rgba(255,255,255,0.2);
+  }
+  .case-project-title {
+    display: none;
+  }
+  .case-credit-line {
+    font-size: 10px; line-height: 2.2;
+    letter-spacing: 0.03em;
+    display: flex; gap: 8px;
+    color: var(--muted);
+  }
+  .case-credit-line strong {
+    font-weight: 700; color: var(--fg);
+    min-width: 72px; flex-shrink: 0;
+  }
+
+  /* Right: title/year + body text */
+  .case-desc {
+    padding: 24px 24px 32px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .case-desc-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .case-desc-title {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--fg);
+  }
+  .case-close {
+    font-size: 9px; letter-spacing: 0.1em;
+    text-transform: uppercase; font-weight: 700;
+    cursor: pointer; background: none;
+    border: 1px solid var(--fg); color: var(--fg);
+    font-family: inherit; padding: 4px 8px;
+    white-space: nowrap; flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+  .case-close:hover { background: var(--fg); color: var(--bg); }
+  .case-body {
+    font-size: 11px; color: #aaa;
+    line-height: 1.85; letter-spacing: 0.01em;
+    max-width: 680px;
+  }
+  .case-body p + p { margin-top: 16px; }
+
+  /* Photo strip: 5 equal columns */
+  
+  .case-photo-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 8px;
+    background: var(--surface);
+  }
+  .case-photo-strip .strip-img {
+    aspect-ratio: 4/3;
+    overflow: hidden; background: #1a1a1a;
+  }
+  .case-photo-strip .strip-img img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+  }
+  .case-photo-strip .strip-img:hover img { transform: scale(1.04); }
+  @media (hover: none) {
+    .case-photo-strip .strip-img:hover img { transform: none; }
+  }
+
+  /* Large photos hidden — all 6 now in the strip grid */
+  .case-photo-large { display: none; }
+
+  
+  .footer {
+    display: grid; grid-template-columns: 1fr auto;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .footer-copy, .footer-lang {
+    font-size: 9px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  .lang-toggle {
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; padding: 0;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .lang-opt {
+    font-size: 9px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    transition: color 0.15s;
+  }
+  .lang-opt.active { color: var(--fg); font-weight: 700; }
+  .lang-sep { font-size: 9px; color: var(--muted); }
+
+  
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg); border: 1px solid var(--fg);
+    padding: 32px; max-width: 320px; width: 90%;
+  }
+  .modal-title {
+    font-size: 9px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 16px; display: block;
+  }
+  .modal a {
+    display: block; font-size: 11px; font-weight: 700;
+    color: var(--fg); text-decoration: none;
+    padding: 8px 0; border-bottom: 1px solid #333;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    transition: color 0.15s;
+  }
+  .modal a:last-of-type { border-bottom: none; }
+  .modal a:hover { color: var(--muted); }
+  .modal-close {
+    margin-top: 24px; font-size: 9px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); cursor: pointer;
+    background: none; border: none;
+    padding: 0; font-family: inherit;
+    font-weight: 700; transition: color 0.15s;
+  }
+  .modal-close:hover { color: var(--fg); }
+
+  
+  .about-modal {
+    background: var(--bg); border: 1px solid var(--fg);
+    width: 90%; max-width: 800px;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    overflow: hidden;
+    max-height: 90vh;
+  }
+  .about-photo {
+    overflow: hidden;
+    min-height: 480px;
+  }
+  .about-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center top;
+    display: block;
+    filter: grayscale(100%);
+  }
+  .about-text {
+    padding: 40px 32px 32px;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    border-left: 1px solid rgba(255,255,255,0.12);
+    overflow-y: auto;
+  }
+  .about-headline {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px; font-weight: 700;
+    line-height: 1.35; letter-spacing: -0.01em;
+    color: var(--fg);
+    margin-bottom: 24px;
+  }
+  .about-body {
+    font-size: 11px; color: #aaa;
+    line-height: 1.85; letter-spacing: 0.01em;
+    margin-bottom: 24px;
+  }
+  .about-body p + p { margin-top: 16px; }
+  .about-clients-label {
+    font-size: 9px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+    display: block; margin-bottom: 8px;
+  }
+  .about-clients {
+    font-size: 11px; color: #aaa;
+    line-height: 1.85;
+  }
+  .about-close {
+    margin-top: 32px; font-size: 9px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); cursor: pointer;
+    background: none; border: none;
+    padding: 0; font-family: inherit;
+    font-weight: 700; transition: color 0.15s;
+    align-self: flex-start;
+  }
+  .about-close:hover { color: var(--fg); }
+  .about-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 32px;
+  }
+  .about-commission {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--fg);
+  }
+
+  @media (max-width: 680px) {
+    .about-modal {
+      grid-template-columns: 45vw 1fr;
+      width: 96%;
+      max-height: 88vh;
+      overflow: hidden;
+    }
+    .about-photo {
+      min-height: 0;
+      height: 88vh;
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+    }
+    .about-photo img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      object-position: center center;
+    }
+    .about-text {
+      padding: 20px 12px 20px;
+      overflow-y: auto;
+      border-left: 1px solid rgba(255,255,255,0.12);
+      border-top: none;
+    }
+    .about-headline {
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+    .about-body { font-size: 10px; margin-bottom: 16px; }
+    .about-clients { font-size: 10px; }
+    .about-close { margin-top: 24px; }
+  }
+
+  
+  .case-youtube {
+    background: #000;
+    padding: 8px;
+  }
+  .yt-facade {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    cursor: pointer;
+    overflow: hidden;
+    background: #000;
+  }
+  .yt-facade img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: opacity 0.2s;
+  }
+  .yt-facade:hover img { opacity: 0.8; }
+  .yt-play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px; height: 44px;
+    background: #ff0000;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .yt-play::after {
+    content: '';
+    border-left: 20px solid #fff;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    margin-left: 4px;
+  }
+  .yt-facade iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  
+  .lightbox-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92); z-index: 200;
+    align-items: center; justify-content: center;
+    cursor: zoom-out;
+  }
+  .lightbox-overlay.open { display: flex; }
+  .lightbox-overlay img {
+    max-width: 92vw; max-height: 92vh;
+    object-fit: contain; display: block;
+    cursor: default;
+  }
+  .lightbox-close {
+    position: fixed; top: 24px; right: 24px;
+    font-size: 9px; letter-spacing: 0.12em;
+    text-transform: uppercase; font-weight: 700;
+    color: #fff; cursor: pointer;
+    background: none; border: 1px solid rgba(255,255,255,0.4);
+    font-family: inherit; padding: 4px 8px;
+    transition: border-color 0.15s;
+  }
+  .lightbox-close:hover { border-color: #fff; }
+
+  .strip-img, .large-img { cursor: zoom-in; }
+
+  
+  @media (max-width: 680px) {
+
+    /* Nav — fixed height, clean flex layout */
+    nav {
+      padding: 0 16px;
+      height: var(--nav-height);
+    }
+    .nav-center { display: none; }
+
+    /* Main */
+    main { padding-top: var(--nav-height); }
+
+    /* Table header — 3 cols: # | project | work */
+    .table-header {
+      grid-template-columns: 32px 1fr auto;
+      padding: 8px 16px;
+    }
+    .table-header .col-label:nth-child(3) { display: none; }
+    .table-header .col-label:nth-child(4) { display: none; }
+
+    /* Project row — 3 cols: # | title | thumbnails */
+    .project-item {
+      grid-template-columns: 32px 1fr auto;
+      gap: 0 8px;
+      padding: 40px 16px;
+      align-items: center;
+    }
+
+    /* Hide category/year and + Info, keep thumbnails */
+    .col-info   { display: none; }
+    .plus-info  { display: none; }
+    .project-images div:nth-child(3) { display: none; }
+    .project-images div { width: 56px; height: 48px; }
+    .project-title { font-size: 13px; }
+    .project-sub   { font-size: 10px; margin-top: 4px; }
+
+    /* Hide thumbnails when row is active (panel open) */
+    .project-item.active .col-action { display: none; }
+
+    /* Case panel — inherits grid-row animation, no override needed */
+    .case-inner { grid-template-columns: 1fr; }
+
+    /* Case top: stack vertically */
+    .case-top { grid-template-columns: 1fr; }
+
+    .case-credits {
+      border-right: none;
+      border-bottom: 0.5px solid rgba(255,255,255,0.2);
+      padding: 16px;
+    }
+    .case-project-title {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .case-credit-line {
+      font-size: 10px;
+      line-height: 2;
+    }
+
+    .case-desc {
+      padding: 16px 16px 24px;
+      gap: 16px;
+    }
+    .case-desc-header {
+      margin-bottom: 16px;
+    }
+    .case-desc-title { font-size: 10px; }
+    .case-body {
+      font-size: 11px;
+      line-height: 1.85;
+    }
+    .case-body p + p { margin-top: 16px; }
+
+    /* Photo strip: 3 cols — same as desktop */
+    .case-photo-strip {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      padding: 4px;
+    }
+
+    /* Large photos: single col */
+    .case-photo-large {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 0 8px 8px;
+    }
+    .case-photo-large .large-img { border-right: none; }
+
+    /* Footer */
+    .footer { padding: 16px; }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     SPLASH — 8-point grid, same token system as the portfolio
+     ----------------------------------------------------------
+     Base unit: 8px
+     Nav: 48px (6u) — matches --nav-height exactly
+     Padding: 24px (3u) — matches portfolio padding
+     Gap/spacing: multiples of 8
+  ═══════════════════════════════════════════════════════════ */
+
+  #splash {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    /* overflow:hidden removed — was clipping the wordmark img bleed */
+    transform: translateY(0);
+    transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+    touch-action: none;
+    /* will-change applied by JS only during drag, not at rest */
+  }
+  #splash.dismissed {
+    transform: translateY(-100%);
+    pointer-events: none;
+  }
+  #splash.dragging {
+    transition: none;
+    cursor: grabbing;
+  }
+
+  /* ── Splash topbar: Arthur Gaspar (esq) + Portfólio (dir) ─ */
+  .splash-topbar {
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .splash-topbar-name {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--fg);
+  }
+  /* lang toggle inside splash topbar — inherits .lang-toggle base styles */
+  .splash-lang-toggle {
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ── Body: bio top-left, wordmark absolute at bottom ───── */
+  .splash-body {
+    flex: 1;
+    position: relative;
+    padding: 40px 24px 0;
+    cursor: ns-resize;
+    /* overflow visible so wordmark can bleed past padding edges;
+       #splash (position:fixed inset:0) is the real clip boundary */
+    overflow: visible;
+  }
+
+  .splash-bio {
+    font-size: 11px;
+    line-height: 1.9;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    max-width: 480px;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: splashFadeUp 0.5s cubic-bezier(0.22,1,0.36,1) 0.25s forwards;
+  }
+  .splash-bio strong {
+    color: var(--fg);
+    font-weight: 700;
+  }
+
+  /* Wordmark: absolute, pinned to bottom of #splash (not .splash-body),
+     bleeds edge-to-edge, bottom ~10% cropped like the reference screenshot */
+  .splash-wordmark {
+    position: absolute;
+    bottom: 0;            /* sem respiro — imagem rasa na borda inferior */
+    left: 0;
+    width: 100%;
+    line-height: 0;
+    user-select: none;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: splashWordUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.05s forwards;
+  }
+  .splash-wordmark img {
+    width: 100%;
+    height: auto;
+    display: block;
+    pointer-events: none;
+  }
+
+  @keyframes splashFadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes splashWordUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Drag hint: anchored 24px from bottom ───────────────── */
+  .splash-hint {
+    position: absolute;
+    bottom: 24px;                     /* 3u */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;                         /* 1u */
+    pointer-events: none;
+    opacity: 0;
+    animation: hintAppear 0.4s ease 1.1s forwards;
+    white-space: nowrap;
+  }
+  .splash-hint-label {
+    font-size: 9px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .splash-hint-line {
+    width: 1px; height: 32px;         /* 4u */
+    background: var(--muted);
+    position: relative; overflow: hidden;
+  }
+  .splash-hint-line::after {
+    content: '';
+    position: absolute; top: -100%; left: 0;
+    width: 1px; height: 100%;
+    background: var(--fg);
+    animation: hintScroll 1.4s cubic-bezier(0.45,0,0.55,1) 1.4s infinite;
+  }
+
+  @keyframes hintAppear { to { opacity: 1; } }
+  @keyframes hintScroll {
+    0%   { top: -100%; opacity: 1; }
+    80%  { opacity: 1; }
+    100% { top: 100%;  opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .splash-bio, .splash-wordmark { animation: none; opacity: 1; transform: none; }
+    .splash-hint { animation: none; opacity: 1; }
+    .splash-hint-line::after { animation: none; }
+    #splash.dismissed { transition: none; }
+  }
+
+  @media (max-width: 680px) {
+    .splash-body { padding: 32px 16px 0; }  /* 4u / 2u */
+    /* wordmark uses fixed 8px bottom — no mobile override needed */
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SPLASH SCREEN
+     Nav mirrors the site nav exactly (same classes, same links)
+     ══════════════════════════════════════════════════════════ -->
+<div id="splash" role="dialog" aria-label="Splash — Arthur Gaspar Portfolio">
+
+  <!-- Top bar da splash: Arthur Gaspar (esq) + lang toggle (dir) -->
+  <div class="splash-topbar">
+    <span class="splash-topbar-name">Arthur Gaspar</span>
+    <button class="lang-toggle splash-lang-toggle" onclick="toggleLang()">
+      <span id="lang-pt" class="lang-opt active">PT</span>
+      <span class="lang-sep">/</span>
+      <span id="lang-en" class="lang-opt">EN</span>
+    </button>
+  </div>
+
+  <!-- Draggable body: bio text only -->
+  <div class="splash-body" id="splash-drag-zone">
+    <p class="splash-bio"
+       data-pt="<strong>Arthur Gaspar</strong> — Designer gráfico<br>baseado no Rio de Janeiro.<br>Branding, Direção de Arte, Motion.<br><strong><u>Open for commissions.</u></strong>"
+       data-en="<strong>Arthur Gaspar</strong> — Graphic Designer<br>based in Rio de Janeiro.<br>Branding, Art Direction, Motion.<br><strong><u>Open for commissions.</u></strong>">
+      <strong>Arthur Gaspar</strong> — Designer gráfico<br>
+      baseado no Rio de Janeiro.<br>
+      Branding, Direção de Arte, Motion.<br>
+      <strong><u>Open for commissions.</u></strong>
+    </p>
+  </div>
+
+  <!-- Wordmark: absolute to #splash, pinned bottom, bleeds edge-to-edge -->
+  <div class="splash-wordmark" aria-hidden="true">
+    <img
+      src="https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774914775/LETRAO_SITE_copy_io4jlz.webp"
+      alt=""
+      draggable="false"
+      fetchpriority="high"
+    >
+  </div>
+
+  <!-- Drag hint -->
+  <div class="splash-hint" aria-hidden="true">
+    <span class="splash-hint-label">Puxe para cima</span>
+    <div class="splash-hint-line"></div>
+  </div>
+
+</div>
+<!-- ══════════════════════════════════════════════════════════ -->
+
+<nav>
+  <span class="nav-name">Arthur Gaspar</span>
+  <span class="nav-center" data-pt="Portfólio" data-en="Portfolio">Portfólio</span>
+  <div class="nav-right">
+    <button class="nav-link" onclick="openModal('contact')" data-pt="Contato" data-en="Contact">Contato</button>
+    <button class="nav-link" onclick="openModal('about')" data-pt="Sobre mim" data-en="About Me">Sobre mim</button>
+  </div>
+</nav>
+
+<main>
+  <div class="table-header">
+    <span class="col-label">#</span>
+    <span class="col-label" data-pt="Projeto / Cliente" data-en="Project / Client">Projeto / Cliente</span>
+    <span class="col-label" data-pt="Categoria / Ano" data-en="Category / Year">Categoria / Ano</span>
+    <span class="col-label right" data-pt="Trabalho" data-en="Work">Trabalho</span>
+  </div>
+
+  <div id="projects-list"></div>
+
+  <div class="footer">
+    <span class="footer-copy">©All rights reserved 2026</span>
+    <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()">
+      <span id="lang-pt-footer" class="lang-opt active">PT</span>
+      <span class="lang-sep">/</span>
+      <span id="lang-en-footer" class="lang-opt">EN</span>
+    </button>
+  </div>
+</main>
+
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <span class="modal-title" data-pt="Contato" data-en="Contact">Contato</span>
+    <!-- ✏️ Substitua pelos seus dados reais -->
+    <a href="mailto:hello@gaspar.works">hello@gaspar.works</a>
+    <a href="https://www.linkedin.com/in/arthur-gaspar-47485b226/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+    <a href="https://www.instagram.com/gasparb__/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+    <button class="modal-close" onclick="closeModal()" data-pt="— Fechar" data-en="— Close">— Fechar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="about-modal" onclick="closeAboutOutside(event)">
+  <div class="about-modal">
+    <div class="about-photo">
+      <img src="https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774551254/FOTO_PORTFOLIO_o1ek16.webp" alt="Arthur Gaspar" loading="lazy" decoding="async">
+    </div>
+    <div class="about-text">
+      <div>
+        <!-- ✏️ Edite o texto abaixo -->
+        <p class="about-headline" data-pt="Olá!" data-en="Hey!">Olá!</p>
+        <div class="about-body">
+          <p data-pt="Arthur Gaspar, 27. Designer Gráfico baseado no Rio de Janeiro. Influenciado pela cultura streetwear e pelas vivências que carrego." data-en="Arthur Gaspar, 27. Graphic Designer based in Rio de Janeiro. Influenced by streetwear culture and your experiences.">Arthur Gaspar, 27. Designer Gráfico baseado no Rio de Janeiro. Influenciado pela cultura streetwear e pelas vivências que carrego.</p>
+        </div>
+        <span class="about-clients-label" data-pt="Curriculum Vitae" data-en="Curriculum Vitae">Curriculum Vitae</span>
+        <p class="about-clients" data-pt="Graduação em Design Gráfico no SENAC / Em andamento<br>Estagiário de Design Gráfico na Filadd" data-en="Graphic Design Degree at SENAC / In progress<br>Graphic Design Intern at Filadd">Graduação em Design Gráfico no SENAC / Em andamento<br>Estagiário de Design Gráfico na Filadd</p>
+      </div>
+      <div class="about-bottom">
+        <span class="about-commission" data-pt="[OPEN FOR COMMISSIONS]" data-en="[OPEN FOR COMMISSIONS]">[OPEN FOR COMMISSIONS]</span>
+        <button class="about-close" onclick="closeAbout()" data-pt="— Fechar" data-en="— Close">— Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">— Fechar</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  // ─────────────────────────────────────────────────────────────────
+  // ✏️  EDITE AQUI: seus projetos
+  //
+  // images      → até 3 miniaturas na linha
+  // caseImages  → fotos do painel expandido (GIFs animados funcionam!)
+  // client      → nome do cliente
+  // caseText    → texto do case study (use <p> para parágrafos)
+  //
+  // Como adicionar imagens:
+  //   Crie "imagens/" ao lado deste arquivo → "imagens/nome.jpg"
+  // ─────────────────────────────────────────────────────────────────
+
+  let currentLang = 'pt';
+
+  const projects = [
+    {
+      images: [
+        "https://i.giphy.com/media/CAMfvsN2Uyy39UZVek/giphy.gif",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199185/2DJWOBBLEv2_baiqca.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199125/4FLYER_WMN_WB_ifn4bv.webp"
+      ],
+      number: "01",
+      title: "Wobble x WANNA MAKE NOISE",
+      client: "Wobble",
+      categoryPt: "Design Gráfico, Motion Design",
+      categoryEn: "Graphic Design, Motion Design",
+      year: "2026",
+      caseImages: [
+        "https://i.giphy.com/media/CAMfvsN2Uyy39UZVek/giphy.gif",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199125/4FLYER_WMN_WB_ifn4bv.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199185/2DJWOBBLEv2_baiqca.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774552790/KKORAYDJWOBBLE_kmzmli.png",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774552790/ROMAINDJWOBBLE_ung464.png",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774552790/LOTES_WBL_2_vsebvy.png",
+        ""
+      ],
+      caseTextPt: `<p>Identidade visual desenvolvida para a festa resultado da colaboração entre os coletivos Wobble e Wanna Make Noise. Fui responsável pela direção criativa, além do desenvolvimento do design e do motion do projeto.</p><p>O conceito do projeto partiu do próprio nome do coletivo. A ideia de associar "NOISE" a um tipo de ruído digital, semelhante às falhas visuais que acontecem quando há um erro na placa de vídeo, gerando pequenas anomalias pixeladas acompanhadas de um som barulhento. A partir disso, explorei algumas técnicas como o "datamoshing" no motion da logo em 3D e pequenos "glitches" nas imagens como parte da estética.</p>`,
+      caseTextEn: `<p>Visual identity developed for the event resulting from the collaboration between the Wobble and Wanna Make Noise collectives. I was responsible for the creative direction, as well as the design and motion development of the project.</p><p>The concept originated from the collective's own name. The idea of associating "NOISE" with a type of digital noise, similar to the visual glitches that occur when there is a graphics card error, generating small pixelated anomalies accompanied by a loud sound. From there, I explored techniques such as "datamoshing" in the 3D logo motion and small "glitches" in the images as part of the aesthetic.</p>`,
+    },
+    {
+      images: [
+        "https://i.giphy.com/media/v9VfOZHdxQ88p9AkWq/giphy.gif",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199184/NOVINHA_DE_ACADEMIA_12x12_d46wsr.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199184/DRAMA_CHOPP_ROTULO_arhkms.webp"
+      ],
+      number: "02",
+      title: "Novinha de Academia",
+      client: "Ávine Vinny, Mc Nito — Maze Hub Criativo",
+      categoryPt: "Design Gráfico, Design Impresso",
+      categoryEn: "Graphic Design, Print Design",
+      year: "2025",
+      youtubeId: "XLFIXeBspu4",
+      youtubeSi: "336L7-bqXHcLkh8Q",
+      caseImages: [
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199184/DRAMA_CHOPP_ROTULO_arhkms.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199184/NOVINHA_DE_ACADEMIA_12x12_d46wsr.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774657413/NOVINHA_GIF_ubkn0q.gif",
+        "","","",""
+      ],
+      caseTextPt: `<p>Fui convidado pela MAZE, hub criativo do Rio de Janeiro, para desenvolver materiais físicos que compuseram a ambientação e a cenografia do audiovisual.</p><p>Direção: Igor Vargas Direção criativa: Gabriel Valente</p>`,
+      caseTextEn: `<p>I was invited by MAZE, a creative hub based in Rio de Janeiro, to develop printed material that were used as part of the audiovisual set design and environment.</p><p>Direction: Igor Vargas
+Creative Direction: Gabriel Valente</p>`,
+    },
+    {
+      images: [
+        "https://i.giphy.com/media/PVz1NSaR1pZs56HbX1/giphy.gif",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774529714/QUADRO_B_v3_copy_hd3zg3.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774529711/JORNAL_BARRACO_copy_giascw.webp"
+      ],
+      number: "03",
+      title: "Barracão Skateshop",
+      client: "Barracão",
+      categoryPt: "Branding, Design Gráfico, Motion Design",
+      categoryEn: "Branding, Graphic Design, Motion Design",
+      year: "2024",
+      caseImages: [
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774529710/CAMISA_qeh7kj.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774529711/JORNAL_BARRACO_copy_giascw.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774529714/QUADRO_B_v3_copy_hd3zg3.webp",
+        "https://i.giphy.com/media/PVz1NSaR1pZs56HbX1/giphy.gif",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774807738/POSTS4_z9qh2l.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774199185/BARRACO_cpbej9.webp"
+      ],
+      caseTextPt: `<p>Identidade visual desenvolvida para a Barracão Skateshop, a segunda do Brasil a aceitar criptomoedas como forma de pagamento. Por isso, a linguagem da marca transita por referências ligadas à Web3, blockchain e ao universo dos criptoativos.</p><p>A proposta foi criar uma logo de fácil leitura, mas ao mesmo tempo memorável e com sensação de movimento. O ponto de partida veio de um insight inesperado: uma lagarta. Ao sobrepor duas lagartas, surgiu a forma de um “B” espinhoso. A partir daí, o processo seguiu com muitos rabiscos e experimentações até chegar ao resultado final.</p>`,
+      caseTextEn: `<p>Visual identity developed for Barracão Skateshop, the second skate shop in Brazil to accept cryptocurrency as payment. Because of this, the brands identity explores references to Web3, blockchain, and crypto culture.</p><p>The goal was to create a logo that felt easy to read yet memorable, with a sense of movement. The concept came from an unexpected insight: a caterpillar. By stacking two caterpillars on top of each other, a spiky “B” shape emerged. From there, the process evolved through many sketches and iterations until reaching the final mark.</p>`,
+    },
+    {
+      images: [
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774659094/DISSIDENTE_V2Artboard_2_lscgx1.jpg",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774213883/THUMB_DISSIDENTETHUMB_DISSI_V2_o0cmrx.jpg",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774214415/dissidente_nldyrc.jpg"
+      ],
+      number: "04",
+      title: "\"DISSIDENTE\" — NOGENTA x BARRACÃO",
+      client: "H.Peres e V.Silva",
+      categoryPt: "Design Gráfico",
+      categoryEn: "Graphic Design",
+      year: "2025",
+      youtubeId: "nroDk9ifdHk",
+      youtubeSi: "-8JFf0NbdvWN5PiK",
+      caseImages: [
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774214415/dissidente_nldyrc.jpg",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774213883/THUMB_DISSIDENTETHUMB_DISSI_V2_o0cmrx.jpg",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774658057/DISSIDENTE_V2Artboard_1_kdwdim.jpg",
+        "","",""
+      ],
+      caseTextPt: `<p>Gráficos desenvolvidos para o filme de skate independente DISSIDENTE. A identidade surgiu de forma natural, com tipografias que transmitem movimento e certa agressividade, refletindo o próprio espírito do filme. O projeto foi distribuído pelo canal 100%SKATE Mag no YouTube, ligado à maior revista de skate do país.</p>`,
+      caseTextEn: `<p>Graphics developed for the independent skate film DISSIDENTE. The visual identity emerged naturally, built around letterforms that convey movement and a certain aggressiveness, echoing the spirit of the films title. The project was distributed through the 100%SKATE Mag channel on YouTube, the digital platform of the largest skate magazine in the country.</p>`,
+    },
+    {
+      images: [
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774658248/SKATE-CINE-NOGENTA_vfaxu5.jpg",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774896907/ROMAIN-FINAL-OFICIAL_copy_h1hwmc.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774658248/SAMBA_JORGINHO_v2_qzgsen.png"
+      ],
+      number: "05",
+      title: "ARQUIVO",
+      client: "Archive",
+      clientEn: "Projects I like",
+      categoryPt: "Diversos",
+      categoryEn: "Various",
+      year: "2023–2026",
+      caseImages: [
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774896907/DUBS-ROMAIN_copy_vddjw7.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774658248/SKATE-CINE-NOGENTA_vfaxu5.jpg",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774658247/SAGITARIONDA_I-D_PNG_eixvtq.jpg",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774896907/ROMAIN-FINAL-OFICIAL_copy_h1hwmc.webp",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774658203/JORGINHO_NOVAROSA_csf7jd.png",
+        "https://res.cloudinary.com/dhqpzgr0u/image/upload/v1774658248/SAMBA_JORGINHO_v2_qzgsen.png",
+        ""
+      ],
+      caseTextPt: `<p>Seleção de experimentações visuais.</p>`,
+      caseTextEn: `<p>A selection of visual explorations.</p>`,
+    },
+  ];
+  const list = document.getElementById('projects-list');
+  let activePanel = null;
+  let activeRow   = null;
+
+  projects.forEach((project, index) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'project-wrap';
+    wrap.style.transitionDelay = `${index * 55}ms`;
+
+    const row = document.createElement('div');
+    row.className = 'project-item';
+
+    const thumbsHTML = [0,1,2].map(i => {
+      const src = project.images[i];
+      return src
+        ? `<div><img src="${src}" alt="${project.title} ${i+1}" loading="lazy" decoding="async"></div>`
+        : `<div><div class="img-placeholder"></div></div>`;
+    }).join('');
+
+    row.innerHTML = `
+      <span class="project-number">(${project.number})</span>
+      <div class="project-main">
+        <span class="project-title">${project.title}</span>
+        <span class="project-sub" data-index="${index}">${project.client}</span>
+      </div>
+      <div class="col-info" data-index="${index}">${currentLang === 'pt' ? project.categoryPt : project.categoryEn}<br>${project.year}/</div>
+      <div class="col-action">
+        <div class="project-images">${thumbsHTML}</div>
+        <span class="plus-info">+ Info</span>
+      </div>
+    `;
+
+    const panel = document.createElement('div');
+    panel.className = 'case-panel';
+
+    // Strip: first 3 images for project 02, all 6 for others
+    const imageCount = project.youtubeId ? 3 : 6;
+    const stripHTML = (project.caseImages || []).slice(0, imageCount).map(src =>
+      src
+        ? `<div class="strip-img" onclick="openLightbox('${src}')"><img src="${src}" alt="${project.title}" loading="lazy" decoding="async"></div>`
+        : `<div class="strip-img"></div>`
+    ).join('');
+
+    // YouTube embed block (only for projects with youtubeId)
+    const youtubeHTML = project.youtubeId
+      ? `<div class="case-youtube">
+           <div class="yt-facade" onclick="loadYT(this, '${project.youtubeId}', '${project.youtubeSi || ''}')">
+             <img src="https://i.ytimg.com/vi/${project.youtubeId}/hqdefault.jpg" alt="Play video" loading="lazy" decoding="async">
+             <div class="yt-play"></div>
+           </div>
+         </div>`
+      : '';
+
+    // Large section no longer used
+    const largeHTML = '';
+
+    // Credits — fixed Categoria / Cliente / Ano format
+    const creditsHTML = `
+      <span class="case-credit-line"><strong>${currentLang === 'pt' ? 'Categoria' : 'Category'}</strong>${currentLang === 'pt' ? project.categoryPt : project.categoryEn}</span>
+      <span class="case-credit-line"><strong>${currentLang === 'pt' ? 'Cliente' : 'Client'}</strong>${project.client}</span>
+      <span class="case-credit-line"><strong>${currentLang === 'pt' ? 'Ano' : 'Year'}</strong>${project.year}</span>
+    `;
+
+    panel.innerHTML = `
+      <div class="case-inner">
+
+        <div class="case-top">
+          <div class="case-credits" data-index="${index}">
+            <span class="case-project-title">${project.title}</span>
+            ${creditsHTML}
+          </div>
+          <div class="case-desc">
+            <div class="case-desc-header">
+              <span class="case-desc-title" data-index="${index}">${project.title}, ${project.year}</span>
+              <button class="case-close" data-index="${index}">${currentLang === 'pt' ? '— Fechar' : '— Close'}</button>
+            </div>
+            <div class="case-body" data-index="${index}">${currentLang === 'pt' ? project.caseTextPt : project.caseTextEn}</div>
+          </div>
+        </div>
+
+        <div class="case-photo-strip">${stripHTML}</div>
+
+        ${youtubeHTML}
+
+        ${largeHTML ? `<div class="case-photo-large">${largeHTML}</div>` : ''}
+
+      </div>
+    `;
+
+    function openPanel() {
+      if (activePanel && activePanel !== panel) {
+        activePanel.classList.remove('open');
+        activeRow.classList.remove('active');
+      }
+      panel.classList.add('open');
+      row.classList.add('active');
+      activePanel = panel;
+      activeRow   = row;
+      // Use rAF to let the grid-rows transition start before scrolling
+      requestAnimationFrame(() => {
+        setTimeout(() => wrap.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'nearest' }), 100);
+      });
+    }
+
+    function closePanel() {
+      panel.classList.remove('open');
+      row.classList.remove('active');
+      activePanel = null;
+      activeRow   = null;
+    }
+
+    row.addEventListener('click', () => {
+      panel.classList.contains('open') ? closePanel() : openPanel();
+    });
+    panel.querySelector(`.case-close[data-index="${index}"]`).addEventListener('click', e => {
+      e.stopPropagation(); closePanel();
+    });
+
+    wrap.appendChild(row);
+    wrap.appendChild(panel);
+    list.appendChild(wrap);
+  });
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ─── Entrance animation ───────────────────────────────────────
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        if (!prefersReducedMotion) {
+          el.style.willChange = 'opacity, transform';
+        }
+        el.classList.add('visible');
+        // Remove will-change after transition completes (400ms + stagger)
+        el.addEventListener('transitionend', () => {
+          el.style.willChange = 'auto';
+        }, { once: true });
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.05 });
+
+  // Skip entrance animation if user prefers reduced motion
+  document.querySelectorAll('.project-wrap').forEach(el => {
+    if (prefersReducedMotion) {
+      el.classList.add('visible');
+    } else {
+      observer.observe(el);
+    }
+  });
+
+  // ─── Language toggle ──────────────────────────────────────────
+  function toggleLang() {
+    currentLang = currentLang === 'pt' ? 'en' : 'pt';
+    const lang = currentLang;
+
+    // Sync both toggles: splash topbar (lang-pt/lang-en) + footer (lang-pt-footer/lang-en-footer)
+    ['lang-pt', 'lang-pt-footer'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('active', lang === 'pt');
+    });
+    ['lang-en', 'lang-en-footer'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('active', lang === 'en');
+    });
+
+    // Static elements with data-pt / data-en (nav, header, modal, about)
+    document.querySelectorAll('[data-pt]').forEach(el => {
+      const val = lang === 'pt' ? el.dataset.pt : el.dataset.en;
+      // Use innerHTML if value contains HTML tags, textContent otherwise
+      if (val && val.includes('<')) {
+        el.innerHTML = val;
+      } else {
+        el.textContent = val;
+      }
+    });
+
+    // Per-project elements — match by data-index
+    projects.forEach((p, i) => {
+
+      document.querySelectorAll(`.col-info[data-index="${i}"]`).forEach(el => {
+        el.innerHTML = `${lang === 'pt' ? p.categoryPt : p.categoryEn}<br>${p.year}/`;
+      });
+
+      document.querySelectorAll(`.project-sub[data-index="${i}"]`).forEach(el => {
+        el.textContent = p.client;
+      });
+
+      document.querySelectorAll(`.case-desc-title[data-index="${i}"]`).forEach(el => {
+        el.textContent = `${p.title}, ${p.year}`;
+      });
+
+      document.querySelectorAll(`.case-close[data-index="${i}"]`).forEach(el => {
+        el.textContent = lang === 'pt' ? '— Fechar' : '— Close';
+      });
+
+      document.querySelectorAll(`.case-body[data-index="${i}"]`).forEach(el => {
+        el.innerHTML = lang === 'pt' ? p.caseTextPt : p.caseTextEn;
+      });
+
+      document.querySelectorAll(`.case-credits[data-index="${i}"]`).forEach(creditsEl => {
+        creditsEl.innerHTML = `
+          <span class="case-project-title">${p.title}</span>
+          <span class="case-credit-line"><strong>${lang === 'pt' ? 'Categoria' : 'Category'}</strong>${lang === 'pt' ? p.categoryPt : p.categoryEn}</span>
+          <span class="case-credit-line"><strong>${lang === 'pt' ? 'Cliente' : 'Client'}</strong>${p.client}</span>
+          <span class="case-credit-line"><strong>${lang === 'pt' ? 'Ano' : 'Year'}</strong>${p.year}</span>
+        `;
+      });
+
+    });
+  }
+
+  // ─── YouTube facade ───────────────────────────────────────────
+  function loadYT(el, id, si) {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube.com/embed/${id}?si=${si}&autoplay=1`;
+    iframe.title = 'YouTube video player';
+    iframe.frameBorder = '0';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.allowFullscreen = true;
+    el.innerHTML = '';
+    el.appendChild(iframe);
+  }
+
+  // ─── Lightbox ─────────────────────────────────────────────────
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.getElementById('lightbox-img').src = '';
+  }
+
+  // ─── Contact modal ────────────────────────────────────────────
+  function openModal(type) {
+    if (type === 'about') {
+      document.getElementById('about-modal').classList.add('open');
+    } else {
+      document.getElementById('modal').classList.add('open');
+    }
+  }
+  function closeModal() { document.getElementById('modal').classList.remove('open'); }
+  function closeAbout() { document.getElementById('about-modal').classList.remove('open'); }
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modal')) closeModal();
+  }
+  function closeAboutOutside(e) {
+    if (e.target === document.getElementById('about-modal')) closeAbout();
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeModal(); closeAbout(); closeLightbox(); }
+  });
+</script>
+
+<script>
+(function () {
+  // ─── 2. Expose modal functions globally so splash buttons work ───
+  // (They are already declared in the outer script above — but in some
+  //  environments inline onclick needs them on window explicitly)
+  window.openModal    = openModal;
+  window.closeModal   = closeModal;
+  window.closeAbout   = closeAbout;
+  window.closeLightbox = closeLightbox;
+  window.toggleLang   = toggleLang;
+  window.loadYT       = loadYT;
+
+  // ─── 3. Drag / swipe / click to dismiss ──────────────────────────
+  var splash   = document.getElementById('splash');
+  var dragZone = document.getElementById('splash-drag-zone');
+  if (!splash || !dragZone) return;
+
+  var prefersRM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var THRESHOLD = 72;   // px upward to trigger dismiss
+
+  var startY   = 0;
+  var lastDY   = 0;
+  var dragging = false;
+  var rafId    = null;
+
+  function dismiss() {
+    dragging = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    splash.classList.remove('dragging');
+    // Let CSS transition do the work — just add the class
+    splash.style.transform = '';  // clear any inline transform first
+    // Force reflow so transition fires from current position
+    splash.getBoundingClientRect();
+    splash.classList.add('dismissed');
+    splash.addEventListener('transitionend', function handler() {
+      splash.removeEventListener('transitionend', handler);
+      splash.style.display    = 'none';
+      splash.style.willChange = 'auto';
+    });
+  }
+
+  function snapBack() {
+    dragging = false;
+    splash.classList.remove('dragging');
+    splash.style.transform  = '';
+    splash.style.willChange = 'auto';
+  }
+
+  // ── Mouse ──────────────────────────────────────────────────────
+  dragZone.addEventListener('mousedown', function (e) {
+    // Don't intercept button/link clicks
+    if (e.target.closest('button, a')) return;
+    startY   = e.clientY;
+    lastDY   = 0;
+    dragging = true;
+    splash.style.willChange = 'transform';
+    splash.classList.add('dragging');
+  });
+
+  window.addEventListener('mousemove', function (e) {
+    if (!dragging) return;
+    var dy = e.clientY - startY;
+    lastDY = dy;
+    if (dy < 0) {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(function () {
+        splash.style.transform = 'translateY(' + dy + 'px)';
+        rafId = null;
+      });
+    }
+  });
+
+  window.addEventListener('mouseup', function () {
+    if (!dragging) return;
+    if (lastDY < -THRESHOLD) { dismiss(); } else { snapBack(); }
+  });
+
+  // ── Touch ──────────────────────────────────────────────────────
+  dragZone.addEventListener('touchstart', function (e) {
+    if (e.target.closest('button, a')) return;
+    startY   = e.touches[0].clientY;
+    lastDY   = 0;
+    dragging = true;
+    splash.style.willChange = 'transform';
+    splash.classList.add('dragging');
+  }, { passive: true });
+
+  window.addEventListener('touchmove', function (e) {
+    if (!dragging) return;
+    var dy = e.touches[0].clientY - startY;
+    lastDY = dy;
+    if (dy < 0) {
+      if (e.cancelable) e.preventDefault();
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(function () {
+        splash.style.transform = 'translateY(' + dy + 'px)';
+        rafId = null;
+      });
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchend', function () {
+    if (!dragging) return;
+    if (lastDY < -THRESHOLD) { dismiss(); } else { snapBack(); }
+  });
+
+  // ── Click (no drag) ────────────────────────────────────────────
+  dragZone.addEventListener('click', function (e) {
+    if (e.target.closest('button, a')) return;
+    if (Math.abs(lastDY) < 6) dismiss();
+  });
+
+  // ── Keyboard ───────────────────────────────────────────────────
+  document.addEventListener('keydown', function (e) {
+    if (splash.classList.contains('dismissed')) return;
+    if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      e.preventDefault();
+      dismiss();
+    }
+  });
+
+  if (prefersRM) {
+    splash.addEventListener('click', function (e) {
+      if (!e.target.closest('button, a')) dismiss();
+    }, { once: true });
+  }
+
+})();
+</script>
+</body>
+</html>
